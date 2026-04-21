@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuerdos Familia Gaona Castillo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Recuerdos Familia">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+    <!-- Protección de autenticación -->
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        if (!requireAuth()) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <div class="container">
+        <header class="header">
+            <h1>Recuerdos Familia Gaona Castillo</h1>
+            <div class="header-actions">
+                <span id="currentUserDisplay" class="header-user-display"></span>
+                <button id="btnUsersManager" class="btn btn-header" onclick="openUsersManager()" title="Mantenedor de Usuarios" style="display: none;">
+                    <i class="fas fa-users-cog"></i> Usuarios
+                </button>
+                <button class="btn btn-header" onclick="openInfoModal()" title="Información y ayuda">
+                    <i class="fas fa-question-circle"></i> Ayuda
+                </button>
+                <button class="btn btn-header" onclick="logout()" title="Cerrar sesión">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+        </header>
+
+        <!-- Resumen de la colección -->
+        <div class="summary-bar">
+            <div class="summary-item">
+                <i class="fas fa-tape"></i>
+                <div class="summary-info">
+                    <span class="summary-value" id="totalCintas">0</span>
+                    <span class="summary-label">Cintas</span>
+                </div>
+            </div>
+            <div class="summary-item">
+                <i class="fas fa-clock"></i>
+                <div class="summary-info">
+                    <span class="summary-value" id="totalMinutos">0</span>
+                    <span class="summary-label">Minutos grabados</span>
+                </div>
+            </div>
+            <div class="summary-item">
+                <i class="fas fa-calendar-alt"></i>
+                <div class="summary-info">
+                    <span class="summary-value" id="totalEventos">0</span>
+                    <span class="summary-label">Eventos</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <div class="search-input-container">
+                <input type="text" id="searchInput" placeholder="Buscar VHS o eventos..." class="search-input">
+                <button class="btn btn-secondary" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="tags-filter-container">
+                <label for="tagsFilter">Filtrar por Tags:</label>
+                <div class="tags-filter" id="tagsFilter">
+                    <!-- Los tags se cargarán dinámicamente aquí -->
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="clearTagsFilter()" title="Limpiar filtro de tags">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="vhs-grid" id="vhsGrid">
+            <!-- Los VHS se cargarán dinámicamente aquí -->
+        </div>
+    </div>
+
+    <!-- Modal de información y ayuda -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> Información y Ayuda</h2>
+                <span class="close" onclick="closeInfoModal()">&times;</span>
+            </div>
+            <div class="info-content">
+                <div class="info-section">
+                    <h3><i class="fas fa-database"></i> Datos de los Videos</h3>
+                    <ul>
+                        <li><strong>Carga automática:</strong> Los datos se cargan automáticamente desde el archivo de la colección</li>
+                        <li><strong>Vista de solo lectura:</strong> Esta versión muestra la información de forma informativa</li>
+                        <li><strong>URLs de YouTube:</strong> Cada evento con link de YouTube permite ir directamente al video</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fab fa-youtube"></i> Funciones de YouTube</h3>
+                    <ul>
+                        <li><strong>Enlaces automáticos:</strong> Si un VHS tiene enlace de YouTube, cada evento tendrá un botón rojo</li>
+                        <li><strong>Reproducción precisa:</strong> El botón lleva directamente al inicio del evento en el video</li>
+                        <li><strong>Icono indicativo:</strong> Los VHS con YouTube muestran un icono en la tarjeta</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-tags"></i> Sistema de Tags</h3>
+                    <ul>
+                        <li><strong>Filtrado por tags:</strong> Selecciona uno o más tags para filtrar los eventos</li>
+                        <li><strong>Colores identificativos:</strong> Cada tag tiene un color único para identificación visual</li>
+                        <li><strong>Filtros combinados:</strong> Usa texto y tags simultáneamente para buscar</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-search"></i> Búsqueda y Filtros</h3>
+                    <ul>
+                        <li><strong>Búsqueda de texto:</strong> Busca en nombres de VHS y contenido de eventos</li>
+                        <li><strong>Filtro por tags:</strong> Selecciona uno o más tags para filtrar</li>
+                        <li><strong>Filtros combinados:</strong> Usa texto y tags simultáneamente</li>
+                        <li><strong>Resultados destacados:</strong> Los términos de búsqueda se resaltan</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-eye"></i> Vista</h3>
+                    <ul>
+                        <li><strong>Cuadrícula:</strong> Vista estándar con tarjetas organizadas en 2 columnas</li>
+                        <li><strong>Expandible:</strong> Las tarjetas están colapsadas por defecto, haz clic para expandir</li>
+                    </ul>
+                </div>
+
+                <div class="info-section theme-selector-section">
+                    <h3><i class="fas fa-palette"></i> Personalizar Tema</h3>
+                    <p>Selecciona los colores para personalizar la aplicación:</p>
+                    
+                    <div class="color-section">
+                        <label><i class="fas fa-circle" style="color: var(--primary-color, #ff0000);"></i> Color Primario</label>
+                        <div class="theme-options color-options" id="primaryColorOptions">
+                            <button class="color-btn" data-color="#ff0000" onclick="setPrimaryColor('#ff0000')" title="Rojo" style="background: #ff0000;"></button>
+                            <button class="color-btn" data-color="#ffa500" onclick="setPrimaryColor('#ffa500')" title="Naranja" style="background: #ffa500;"></button>
+                            <button class="color-btn" data-color="#ffff00" onclick="setPrimaryColor('#ffff00')" title="Amarillo" style="background: #ffff00;"></button>
+                            <button class="color-btn" data-color="#008000" onclick="setPrimaryColor('#008000')" title="Verde" style="background: #008000;"></button>
+                            <button class="color-btn" data-color="#0000ff" onclick="setPrimaryColor('#0000ff')" title="Azul" style="background: #0000ff;"></button>
+                            <button class="color-btn" data-color="#4b0082" onclick="setPrimaryColor('#4b0082')" title="Índigo" style="background: #4b0082;"></button>
+                            <button class="color-btn" data-color="#ee82ee" onclick="setPrimaryColor('#ee82ee')" title="Violeta" style="background: #ee82ee;"></button>
+                            <button class="color-btn" data-color="#000000" onclick="setPrimaryColor('#000000')" title="Negro" style="background: #000000;"></button>
+                            <button class="color-btn" data-color="#808080" onclick="setPrimaryColor('#808080')" title="Gris" style="background: #808080;"></button>
+                            <button class="color-btn" data-color="#ffffff" onclick="setPrimaryColor('#ffffff')" title="Blanco" style="background: #ffffff;"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="color-section">
+                        <label><i class="fas fa-circle" style="color: var(--secondary-color, #0000ff);"></i> Color Secundario</label>
+                        <div class="theme-options color-options" id="secondaryColorOptions">
+                            <button class="color-btn" data-color="#ff0000" onclick="setSecondaryColor('#ff0000')" title="Rojo" style="background: #ff0000;"></button>
+                            <button class="color-btn" data-color="#ffa500" onclick="setSecondaryColor('#ffa500')" title="Naranja" style="background: #ffa500;"></button>
+                            <button class="color-btn" data-color="#ffff00" onclick="setSecondaryColor('#ffff00')" title="Amarillo" style="background: #ffff00;"></button>
+                            <button class="color-btn" data-color="#008000" onclick="setSecondaryColor('#008000')" title="Verde" style="background: #008000;"></button>
+                            <button class="color-btn" data-color="#0000ff" onclick="setSecondaryColor('#0000ff')" title="Azul" style="background: #0000ff;"></button>
+                            <button class="color-btn" data-color="#4b0082" onclick="setSecondaryColor('#4b0082')" title="Índigo" style="background: #4b0082;"></button>
+                            <button class="color-btn" data-color="#ee82ee" onclick="setSecondaryColor('#ee82ee')" title="Violeta" style="background: #ee82ee;"></button>
+                            <button class="color-btn" data-color="#000000" onclick="setSecondaryColor('#000000')" title="Negro" style="background: #000000;"></button>
+                            <button class="color-btn" data-color="#808080" onclick="setSecondaryColor('#808080')" title="Gris" style="background: #808080;"></button>
+                            <button class="color-btn" data-color="#ffffff" onclick="setSecondaryColor('#ffffff')" title="Blanco" style="background: #ffffff;"></button>
+                        </div>
+                    </div>
+
+                    <div class="color-section">
+                        <label><i class="fas fa-fill-drip"></i> Color de Fondo</label>
+                        <div class="theme-options color-options" id="backgroundColorOptions">
+                            <button class="color-btn" data-color="#ffffff" onclick="setBackgroundColor('#ffffff')" title="Blanco" style="background: #ffffff;"></button>
+                            <button class="color-btn" data-color="#f5f5f5" onclick="setBackgroundColor('#f5f5f5')" title="Gris muy claro" style="background: #f5f5f5;"></button>
+                            <button class="color-btn" data-color="#e0e0e0" onclick="setBackgroundColor('#e0e0e0')" title="Gris claro" style="background: #e0e0e0;"></button>
+                            <button class="color-btn" data-color="#c0c0c0" onclick="setBackgroundColor('#c0c0c0')" title="Plateado" style="background: #c0c0c0;"></button>
+                            <button class="color-btn" data-color="#a9a9a9" onclick="setBackgroundColor('#a9a9a9')" title="Gris oscuro" style="background: #a9a9a9;"></button>
+                            <button class="color-btn" data-color="#808080" onclick="setBackgroundColor('#808080')" title="Gris" style="background: #808080;"></button>
+                            <button class="color-btn" data-color="#696969" onclick="setBackgroundColor('#696969')" title="Gris dim" style="background: #696969;"></button>
+                            <button class="color-btn" data-color="#404040" onclick="setBackgroundColor('#404040')" title="Gris muy oscuro" style="background: #404040;"></button>
+                            <button class="color-btn" data-color="#202020" onclick="setBackgroundColor('#202020')" title="Casi negro" style="background: #202020;"></button>
+                            <button class="color-btn" data-color="#000000" onclick="setBackgroundColor('#000000')" title="Negro" style="background: #000000;"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="color-preview">
+                        <div class="preview-box" id="colorPreview" style="background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 100%);">
+                            <span>Vista previa</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal para reproducir videos de YouTube -->
+    <div id="youtubeModal" class="modal">
+        <div class="modal-content modal-youtube">
+            <div class="modal-header">
+                <h2><i class="fab fa-youtube"></i> Reproducir Video</h2>
+                <span class="close" onclick="closeYouTubeModal()">&times;</span>
+            </div>
+            <div class="youtube-container">
+                <iframe id="youtubePlayer" width="100%" height="400" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="modal-footer" style="padding: 15px; text-align: center; border-top: 1px solid #e0e0e0;">
+                <p style="color: #666; font-size: 13px; margin-bottom: 10px;">
+                    <i class="fas fa-info-circle"></i> Si el video no se reproduce, puede abrirlo directamente en YouTube
+                </p>
+                <button onclick="openYouTubeFromModal()" class="btn btn-youtube" style="background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                    <i class="fab fa-youtube"></i> Abrir en YouTube
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Mantenedor de Usuarios -->
+    <div id="usersModal" class="modal">
+        <div class="modal-content users-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-users-cog"></i> Mantenedor de Usuarios</h2>
+                <span class="close" onclick="closeUsersModal()">&times;</span>
+            </div>
+            <div class="users-modal-body">
+                <button class="btn btn-add-user" onclick="openUserForm()">
+                    <i class="fas fa-plus"></i> Agregar Usuario
+                </button>
+                <div class="users-grid" id="usersGrid">
+                    <!-- Usuarios se cargan aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Formulario de Usuario -->
+    <div id="userFormModal" class="modal">
+        <div class="modal-content user-form-modal-content">
+            <div class="modal-header">
+                <h2 id="userFormTitle"><i class="fas fa-user"></i> Nuevo Usuario</h2>
+                <span class="close" onclick="closeUserForm()">&times;</span>
+            </div>
+            <div class="user-form-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="userName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Usuario</label>
+                        <input type="text" id="userUsername" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="userPassword" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rol</label>
+                        <select id="userRole" class="form-control">
+                            <option value="user">Usuario</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-login">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Mostrar usuario actual y botón de admin si corresponde
+        (function() {
+            const user = getCurrentUser();
+            console.log('DEBUG - currentUser:', user);
+            if (user) {
+                document.getElementById('currentUserDisplay').innerHTML = 
+                    `<i class="fas fa-user"></i> ${user.name}`;
+                // Mostrar botón de mantenedor solo para admin
+                if (user.role === 'admin') {
+                    document.getElementById('btnUsersManager').style.display = 'inline-flex';
+                } else {
+                    // Centrar botones cuando no hay botón de admin
+                    document.querySelector('.header-actions').classList.add('centered');
+                }
+            } else {
+                console.log('DEBUG - No hay usuario actual');
+            }
+        })();
+
+        // Variables para colores
+        let primaryColor = localStorage.getItem('vhsPrimaryColor') || '#667eea';
+        let secondaryColor = localStorage.getItem('vhsSecondaryColor') || '#764ba2';
+        let backgroundColor = localStorage.getItem('vhsBackgroundColor') || '#f5f5f5';
+
+        // Función para establecer color primario
+        function setPrimaryColor(color) {
+            primaryColor = color;
+            localStorage.setItem('vhsPrimaryColor', color);
+            document.documentElement.style.setProperty('--primary-color', color);
+            updateColorButtons('primaryColorOptions', color);
+            applyColors();
+        }
+
+        // Función para establecer color secundario
+        function setSecondaryColor(color) {
+            secondaryColor = color;
+            localStorage.setItem('vhsSecondaryColor', color);
+            document.documentElement.style.setProperty('--secondary-color', color);
+            updateColorButtons('secondaryColorOptions', color);
+            applyColors();
+        }
+
+        // Función para establecer color de fondo
+        function setBackgroundColor(color) {
+            backgroundColor = color;
+            localStorage.setItem('vhsBackgroundColor', color);
+            document.documentElement.style.setProperty('--background-color', color);
+            updateColorButtons('backgroundColorOptions', color);
+            applyColors();
+        }
+
+        // Actualizar estado activo de botones de color
+        function updateColorButtons(containerId, activeColor) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.color === activeColor) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Aplicar colores a la interfaz
+        function applyColors() {
+            // Las variables CSS se aplican automáticamente a los elementos
+            // Solo actualizamos el preview manualmente
+            const gradient = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+            const preview = document.getElementById('colorPreview');
+            if (preview) {
+                preview.style.background = gradient;
+            }
+        }
+
+        // Cargar colores guardados al iniciar
+        (function() {
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            document.documentElement.style.setProperty('--background-color', backgroundColor);
+            applyColors();
+            
+            // Marcar botones activos cuando se abra el modal
+            setTimeout(() => {
+                updateColorButtons('primaryColorOptions', primaryColor);
+                updateColorButtons('secondaryColorOptions', secondaryColor);
+                updateColorButtons('backgroundColorOptions', backgroundColor);
+            }, 100);
+        })();
+    </script>
+</body>
+</html>

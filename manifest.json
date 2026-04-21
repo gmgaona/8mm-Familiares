@@ -1,0 +1,27 @@
+{
+  "name": "Recuerdos Familia Gaona Castillo",
+  "short_name": "Recuerdos Familia",
+  "description": "Aplicación para gestionar recuerdos familiares en VHS",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "lifestyle"],
+  "lang": "es"
+}
+

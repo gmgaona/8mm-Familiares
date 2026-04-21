@@ -1,0 +1,84 @@
+{
+  "tags": [
+    {
+      "id": 1,
+      "name": "Castillo Quintana",
+      "color": "#667eea",
+      "code": "1"
+    },
+    {
+      "id": 2,
+      "name": "Leiva Castillo",
+      "color": "#48bb78",
+      "code": "2"
+    },
+    {
+      "id": 3,
+      "name": "Toro Castillo",
+      "color": "#ed8936",
+      "code": "3"
+    },
+    {
+      "id": 4,
+      "name": "Castillo Gatica",
+      "color": "#9f7aea",
+      "code": "4"
+    },
+    {
+      "id": 5,
+      "name": "Poblete Castillo",
+      "color": "#f56565",
+      "code": "5"
+    },
+    {
+      "id": 6,
+      "name": "Castillo  Monroe",
+      "color": "#00fbff",
+      "code": "6"
+    },
+    {
+      "id": 7,
+      "name": "Guajardo Gaona",
+      "color": "#002cf0",
+      "code": "7"
+    },
+    {
+      "id": 8,
+      "name": "Flores Gaona",
+      "color": "#eeff00",
+      "code": "8"
+    },
+    {
+      "id": 9,
+      "name": "Gaona Lillo",
+      "color": "#80d9ff",
+      "code": "9"
+    },
+    {
+      "id": 10,
+      "name": "Gaona Beroiza",
+      "color": "#008002",
+      "code": "10"
+    },
+    {
+      "id": 11,
+      "name": "Gaona Castillo",
+      "color": "#ffffff",
+      "code": "11"
+    },
+    {
+      "id": 12,
+      "name": "Castillo Soto",
+      "color": "#ee00ff",
+      "code": "12"
+    },
+    {
+      "id": 13,
+      "name": "Herrera Castillo",
+      "color": "#ff3d3d",
+      "code": "13"
+    }
+  ],
+  "nextTagId": 14,
+  "exportDate": "2025-09-01T16:04:30.445Z"
+}
